@@ -10,6 +10,27 @@ import CoreLocation
 
 public class GPSHeadingOptions: CustomStringConvertible, Codable {
     
+    
+    /// Type of subscription.
+    ///
+    /// - `single`: single one shot subscription. After receiving the first data request did end.
+    /// - `continous`: continous subscription. You must end it manually.
+    public enum Subscription: String, Codable {
+        case single
+        case continous
+        
+        internal var service: LocationManagerSettings.Services {
+            switch self {
+            case .single, .continous:
+                return .continousLocation
+        }
+        }
+        public var description: String {
+            rawValue
+        }
+        
+    }
+    
     /// The timeout policy of the request.
     ///
     /// - `immediate`: timeout countdown starts immediately after the request is added regardless the current authorization level.
@@ -134,13 +155,13 @@ public class GPSHeadingOptions: CustomStringConvertible, Codable {
         // Encodable protocol
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(orientation, forKey: .orientation)
+            try container.encode(orientation.rawValue, forKey: .orientation)
         }
         
         // Decodable protocol
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            let orientation = try container.decode(CLDeviceOrientation.self, forKey: .orientation)
+            let orientation = try CLDeviceOrientation(rawValue: container.decode(Int32.self, forKey: .orientation)) ?? .portrait
             
             self = .orientation(orientation)
         }
@@ -148,6 +169,9 @@ public class GPSHeadingOptions: CustomStringConvertible, Codable {
     
     /// Associated request.
     public weak var request: GPSHeadingRequest?
+        
+    /// Subscription level, by default is set to `continous`.
+    public var subscription: Subscription = .single
     
     /// Specifies the minimum amount of change in degrees needed for a heading service update.
     public var headingFilter: CLLocationDegrees = kCLHeadingFilterNone
@@ -159,12 +183,18 @@ public class GPSHeadingOptions: CustomStringConvertible, Codable {
     /// Timeout level, by default is `nil` which means no timeout policy is set and you must end the request manually.
     public var timeout: Timeout?
     
+    /// Minimum time interval since last valid received data to report new fresh data.
+    /// By default is set to `nil` which means no filter is applied.
+    public var minTimeInterval: TimeInterval?
+    
     /// Description of the options.
     public var description: String {
         return "{" + [
+            "subscription= \(subscription)",
             "timeout= \(timeout?.description ?? "none")",
             "headingFilter= \(headingFilter)",
-            "headingOrientation= \(headingOrientation)"
+            "headingOrientation= \(headingOrientation)",
+            "minTimeInterval= \(minTimeInterval ?? 0)"
         ].joined(separator: ", ") + "}"
     }
     
@@ -178,22 +208,26 @@ public class GPSHeadingOptions: CustomStringConvertible, Codable {
     // MARK: - Codable
     
     enum CodingKeys: String, CodingKey {
-        case timeout, headingFilter, headingOrientation
+        case timeout, subscription, headingFilter, minTimeInterval, headingOrientation
     }
     
     // Encodable protocol
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(subscription, forKey: .subscription)
         try container.encodeIfPresent(timeout, forKey: .timeout)
         try container.encode(headingFilter, forKey: .headingFilter)
-        try container.encode(headingOrientation, forKey: .headingOrientation)
+        try container.encodeIfPresent(minTimeInterval, forKey: .minTimeInterval)
+        try container.encode(headingOrientation.rawValue, forKey: .headingOrientation)
     }
     
     // Decodable protocol
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.subscription = try container.decode(Subscription.self, forKey: .subscription)
         self.timeout = try container.decodeIfPresent(Timeout.self, forKey: .timeout)
         self.headingFilter = try container.decode(CLLocationDegrees.self, forKey: .headingFilter)
-        self.headingOrientation = try container.decode(CLDeviceOrientation.self, forKey: .headingOrientation)
+        self.minTimeInterval = try container.decodeIfPresent(TimeInterval.self, forKey: .minTimeInterval)
+        self.headingOrientation = try CLDeviceOrientation(rawValue: container.decode(Int32.self, forKey: .headingOrientation)) ?? .portrait
     }
 }

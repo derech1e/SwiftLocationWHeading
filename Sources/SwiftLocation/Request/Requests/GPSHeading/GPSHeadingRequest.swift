@@ -119,15 +119,16 @@ public class GPSHeadingRequest: RequestProtocol, Codable {
             return .requestNotEnabled // request is not enabled so we'll discard data.
         }
         
-        guard data.horizontalAccuracy <= options.accuracy.value else {
-            return .notMinAccuracy // accuracy level is below the minimum set
-        }
+        // TODO: IMPL THIS
+//        guard data.headingAccuracy <= options.accuracy.value else {
+//            return .notMinAccuracy // accuracy level is below the minimum set
+//        }
         
         if let previousHeading = lastHeading {
             // We have already received a previous valid heading so we'll
             // also check for distance and interval if required and eventually dispatch value.
             if options.headingFilter > kCLDistanceFilterNone,
-               previousHeading.distance(from: data) < options.headingFilter {
+               previousHeading.magneticHeading < options.headingFilter {
                 return .notMinDistance // minimum distance since last heading is not respected.
             }
             
@@ -188,7 +189,5 @@ public extension Result where Success == CLHeading, Failure == LocationError {
             return "Success \(heading.description)"
         }
     }
-    
-}
     
 }
