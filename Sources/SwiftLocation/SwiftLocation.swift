@@ -621,6 +621,10 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         enumerateQueue(gpsRequests) { request in
             request.startTimeoutIfNeeded()
         }
+        
+        enumerateQueue(headingRequests) { request in
+            request.startTimeoutIfNeeded()
+        }
     }
     
     private func bestSettingsForCoreLocationManager() -> LocationManagerSettings {
