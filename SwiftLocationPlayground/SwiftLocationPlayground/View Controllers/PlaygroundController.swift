@@ -97,14 +97,14 @@ public class PlaygroundController: UIViewController, UITableViewDataSource, UITa
             navigationController?.pushViewController(AutocompleteController.create(), animated: true)
         case .geocoder:
             navigationController?.pushViewController(GeocoderController.create(), animated: true)
-        case .beaconBroadcast:
-            navigationController?.pushViewController(BroadcastBeaconController.create(), animated: true)
-        case .beaconRanging:
-            navigationController?.pushViewController(BeaconsMonitorController.create(), animated: true)
         case .authRequest:
             requestAuthorizations()
         case .credentailsStore:
             setCredentialsStoreValue()
+        case .beaconBroadcast:
+            navigationController?.pushViewController(GeocoderController.create(), animated: true)
+        case .beaconRanging:
+            navigationController?.pushViewController(GeocoderController.create(), animated: true)
         }
     }
     

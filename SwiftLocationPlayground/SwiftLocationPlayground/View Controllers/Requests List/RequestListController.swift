@@ -228,7 +228,7 @@ class RequestListController: UIViewController, UITableViewDelegate, UITableViewD
 fileprivate class ListData {
     var visits = [VisitsRequest]()
     var gps = [GPSLocationRequest]()
-    var heading = [GPSLocationRequest]()
+    var heading = [GPSHeadingRequest]()
     var ip = [IPLocationRequest]()
     var geofencing = [GeofencingRequest]()
     var geocode = [GeocoderRequest]()
@@ -304,7 +304,14 @@ fileprivate extension RequestProtocol {
                 "› minInterval: \(gps.options.minTimeInterval?.description ?? NOT_SET)"
             ].joined(separator: "\n")
             
-            case let heading 
+        case let heading as GPSHeadingRequest:
+            return [
+            "› last: \(heading.lastReceivedValue?.description ?? "-")",
+            "› type: \(heading.options.subscription.description)",
+            "› filter: \(heading.options.headingFilter.description)",
+            "› orientation: \(heading.options.headingOrientation)",
+            "› minInterval: \(heading.options.minTimeInterval?.description ?? NOT_SET)"
+        ].joined(separator: "\n")
             
         case let ip as IPLocationRequest:
             return [
