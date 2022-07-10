@@ -191,6 +191,13 @@ public class DeviceLocationManager: NSObject, LocationManagerImpProtocol, CLLoca
         delegate?.locationManager(didReceiveLocations: locations)
     }
     
+    // MARK: - CLLocationManagerDelegate (Location Heading)
+    
+    public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        LocationManager.Logger.log("Received new heading: \(newHeading)")
+        delegate?.locationManager(didUpdateHeading: newHeading)
+    }
+    
     // MARK: - CLLocationManagerDelegate (Geofencing)
     
     public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
