@@ -115,34 +115,34 @@ public class GPSHeadingRequest: RequestProtocol, Codable {
     // MARK: - Public Functions
 
     public func validateData(_ data: ProducedData) -> DataDiscardReason? {
-//        guard isEnabled else {
-//            return .requestNotEnabled // request is not enabled so we'll discard data.
+        guard isEnabled else {
+            return .requestNotEnabled // request is not enabled so we'll discard data.
+        }
+        
+        // TODO: IMPL THIS
+//        guard data.headingAccuracy <= options.accuracy.value else {
+//            return .notMinAccuracy // accuracy level is below the minimum set
 //        }
-//
-//        // TODO: IMPL THIS
-////        guard data.headingAccuracy <= options.accuracy.value else {
-////            return .notMinAccuracy // accuracy level is below the minimum set
-////        }
-//
-//        if let previousHeading = lastHeading {
-//            // We have already received a previous valid heading so we'll
-//            // also check for distance and interval if required and eventually dispatch value.
-//            if options.headingFilter > kCLDistanceFilterNone,
-//               previousHeading.magneticHeading < options.headingFilter {
-//                return .notMinDistance // minimum distance since last heading is not respected.
-//            }
-//
-//            if let minInterval = options.minTimeInterval,
-//               Date().timeIntervalSince(previousHeading.timestamp) <= minInterval {
-//                return .notMinInterval // minimum time interval since last heading is not respected.
-//            }
-//        } else {
-//            // This is the first time we receive a heading inside this request.
-//            // We have validated the accuracy so we can store it. Subsequent
-//            // call of the validateData method will land in the if above and also
-//            // check the minDistance and minInterval.
-//            lastHeading = data
-//        }
+        
+        if let previousHeading = lastHeading {
+            // We have already received a previous valid heading so we'll
+            // also check for distance and interval if required and eventually dispatch value.
+            if options.headingFilter > kCLDistanceFilterNone,
+               previousHeading.magneticHeading < options.headingFilter {
+                return .notMinDistance // minimum distance since last heading is not respected.
+            }
+            
+            if let minInterval = options.minTimeInterval,
+               Date().timeIntervalSince(previousHeading.timestamp) <= minInterval {
+                return .notMinInterval // minimum time interval since last heading is not respected.
+            }
+        } else {
+            // This is the first time we receive a heading inside this request.
+            // We have validated the accuracy so we can store it. Subsequent
+            // call of the validateData method will land in the if above and also
+            // check the minDistance and minInterval.
+            lastHeading = data
+        }
         
         // Store previous value because it was validated.
         lastHeading = data
@@ -151,16 +151,16 @@ public class GPSHeadingRequest: RequestProtocol, Codable {
     }
     
     public func startTimeoutIfNeeded() {
-//        guard let timeout = options.timeout, // has valid timeout settings
-//              timeout.canFireTimer, // can fire the timer (timeout is immediate or delayed with auth ok)
-//              timeoutTimer == nil else { // timer never started yet for this request
-//            return
-//        }
-//
-//        timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout.interval, repeats: false, block: { [weak self] timer in
-//            timer.invalidate()
-//            self?.receiveData(.failure(.timeout))
-//        })
+        guard let timeout = options.timeout, // has valid timeout settings
+              timeout.canFireTimer, // can fire the timer (timeout is immediate or delayed with auth ok)
+              timeoutTimer == nil else { // timer never started yet for this request
+            return
+        }
+        
+        timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout.interval, repeats: false, block: { [weak self] timer in
+            timer.invalidate()
+            self?.receiveData(.failure(.timeout))
+        })
     }
     
     public var description: String {
