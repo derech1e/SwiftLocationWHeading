@@ -183,8 +183,7 @@ public struct LocationManagerSettings: CustomStringConvertible, Equatable {
         return
             activeServices.contains(.continousLocation) ||
             activeServices.contains(.significantLocation) ||
-            activeServices.contains(.visits) ||
-            activeServices.contains(.heading)
+            activeServices.contains(.visits)
     }
     
     public var description: String {

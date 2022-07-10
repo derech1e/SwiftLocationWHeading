@@ -51,6 +51,9 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
     /// Called when a new set of gps requests has been restored from relaunched app instance.
     public var onRestoreGPS: (([GPSLocationRequest]) -> Void)?
     
+    /// Called when a new set of gps requests has been restored from relaunched app instance.
+    public var onRestoreHeading: (([GPSHeadingRequest]) -> Void)?
+    
     /// Called when a new set of visits requests has been restored from relaunched app instance.
     public var onRestoreVisits: (([VisitsRequest]) -> Void)?
 
@@ -221,6 +224,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
             "visits": visitsRequest.description,
             "geofence": geofenceRequests.description,
             "gps": gpsRequests.description,
+            "heading": headingRequests.description
         ]
         return JSONStringify(data)
     }
@@ -405,6 +409,9 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         case let location as GPSLocationRequest:
             gpsRequests.remove(location)
             
+        case let heading as GPSHeadingRequest:
+            headingRequests.remove(heading)
+            
         case let geofence as GeofencingRequest:
             geofenceRequests.remove(geofence)
             
@@ -470,6 +477,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
             let defaults = UserDefaults.standard
             defaults.setValue(try JSONEncoder().encode(geofenceRequests.list), forKey: UserDefaultsKeys.GeofenceRequests)
             defaults.setValue(try JSONEncoder().encode(gpsRequests.list), forKey: UserDefaultsKeys.GPSRequests)
+            defaults.setValue(try JSONEncoder().encode(headingRequests.list), forKey: UserDefaultsKeys.GPSHeadingRequests)
             defaults.setValue(try JSONEncoder().encode(visitsRequest.list), forKey: UserDefaultsKeys.VisitsRequests)
             return true
         } catch {
@@ -489,6 +497,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         
         onRestoreGeofences?(geofenceRequests.add(restorableGeofences, silent: true))
         onRestoreGPS?(gpsRequests.add(decodeSavedQueue(UserDefaultsKeys.GPSRequests), silent: true))
+        onRestoreHeading?(headingRequests.add(decodeSavedQueue(UserDefaultsKeys.GPSHeadingRequests), silent: true))
         onRestoreVisits?(visitsRequest.add(decodeSavedQueue(UserDefaultsKeys.VisitsRequests), silent: true))
 
         saveState()
@@ -864,6 +873,7 @@ public extension LocationManager {
 fileprivate enum UserDefaultsKeys {
     static let GeofenceRequests = "com.swiftlocation.requests.geofence"
     static let GPSRequests = "com.swiftlocation.requests.gps"
+    static let GPSHeadingRequests = "com.swiftlocation.requests.heading"
     static let VisitsRequests = "com.swiftlocation.visits.gps"
     static let LastKnownGPSLocation = "com.swiftlocation.last-gps-location"
     static let LastKnownGPSHeading = "com.swiftlocation.last-gps-heading"
