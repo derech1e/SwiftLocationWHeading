@@ -645,7 +645,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         
         if headingRequests.hasActiveRequests {
             enumerateQueue(headingRequests) { request in
-                services.insert(.heading)
+                services.insert(request.options.subscription.service)
             }
         }
         
