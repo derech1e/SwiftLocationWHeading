@@ -409,8 +409,8 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         case let location as GPSLocationRequest:
             gpsRequests.remove(location)
             
-        case let heading as GPSHeadingRequest:
-            headingRequests.remove(heading)
+        case let gpsHeading as GPSHeadingRequest:
+            headingRequests.remove(gpsHeading)
             
         case let geofence as GeofencingRequest:
             geofenceRequests.remove(geofence)
@@ -451,6 +451,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
     /// - Parameter tokenID: token identifier.
     public func cancel(subscription identifier: Identifier) {
         gpsRequests.list.first(where: { $0.subscriptionWithID(identifier) != nil })?.cancel(subscription: identifier)
+        headingRequests.list.first(where: { $0.subscriptionWithID(identifier) != nil })?.cancel(subscription: identifier)
     }
     
     // MARK: - Setting up

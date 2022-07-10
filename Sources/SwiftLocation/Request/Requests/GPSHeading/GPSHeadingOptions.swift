@@ -181,7 +181,7 @@ public class GPSHeadingOptions: CustomStringConvertible, Codable {
     public var headingOrientation: CLDeviceOrientation = .portrait
     
     /// Timeout level, by default is `nil` which means no timeout policy is set and you must end the request manually.
-    public var timeout: Timeout?
+    public var timeout: Timeout? = .delayed(<#T##TimeInterval#>)
     
     /// Minimum time interval since last valid received data to report new fresh data.
     /// By default is set to `nil` which means no filter is applied.
