@@ -569,7 +569,8 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         let hasRequestsWithAlwaysAuthRequired = (
             geofenceRequests.hasActiveRequests ||
             visitsRequest.hasActiveRequests ||
-            beaconsRequests.hasActiveRequests
+            beaconsRequests.hasActiveRequests ||
+            headingRequests.hasActiveRequests
         )
         let authMode: AuthorizationMode = (hasRequestsWithAlwaysAuthRequired ? .always : preferredAuthorizationMode)
         manager?.requestAuthorization(authMode) { [weak self] auth in
@@ -605,6 +606,7 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
         guard authorizationStatus.isRejected == true else {
             // If we have already the authorization even request with `avoidRequestAuthorization = true`
             // may receive notifications of locations.
+            print("FAILED 1")
             return
         }
         
@@ -634,6 +636,12 @@ public class LocationManager: LocationManagerDelegate, CustomStringConvertible {
             settings.accuracy = min(settings.accuracy, request.options.accuracy)
             settings.minDistance = max(settings.minDistance, request.options.minDistance)
             settings.activityType = CLActivityType(rawValue: max(settings.activityType.rawValue, request.options.activityType.rawValue)) ?? .other
+        }
+        
+        if headingRequests.hasActiveRequests {
+            enumerateQueue(headingRequests) { request in
+                services.insert(.heading)
+            }
         }
         
         // Geofence
