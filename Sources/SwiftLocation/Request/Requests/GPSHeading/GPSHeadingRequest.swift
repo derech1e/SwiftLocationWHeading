@@ -160,6 +160,7 @@ public class GPSHeadingRequest: RequestProtocol, Codable {
         timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout.interval, repeats: false, block: { [weak self] timer in
             timer.invalidate()
             self?.receiveData(.failure(.timeout))
+            self?.evictionPolicy = [.onError, .onReceiveData(count: self?.countReceivedData)]
         })
     }
     
